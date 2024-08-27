@@ -69,6 +69,7 @@ const createCardBody = (data, container) => {
     deleteIcon.setAttribute("class", "bi bi-trash");
     deleteBtn.appendChild(deleteIcon);
 
+    modifyBtn.addEventListener("click", () => window.location = `./backoffice.html?q=${data._id}`)
     deleteBtn.addEventListener("click", () => deleteItem(data._id))
 
     buttonsContainer.append(modifyBtn, deleteBtn);

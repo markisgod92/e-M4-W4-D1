@@ -33,6 +33,23 @@ export class fetchAPI {
         }
     }
 
+    async put(id, modObj) {
+        try {
+            const response = await fetch(this.#API_URL + id, {
+                method: "PUT",
+                headers: {
+                    "Authorization": this.#ACCESS_TOKEN,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(modObj)
+            })
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error("PUT error", error)
+        }
+    }
+
     async del(id) {
         try {
             const response = await fetch(this.#API_URL + id, {

@@ -1,5 +1,7 @@
 import { fetchAPI } from "./class.js";
 const productApi = new fetchAPI;
+const params = new URLSearchParams(window.location.search);
+const query = params.get("q");
 
 const nameInput = document.getElementById("nameInput");
 const brandInput = document.getElementById("brandInput");
@@ -7,6 +9,33 @@ const descriptionInput = document.getElementById("descriptionInput");
 const priceInput = document.getElementById("priceInput");
 const imgUrlInput = document.getElementById("imgUrlInput");
 const createBtn = document.getElementById("createBtn");
+const modifyBtn = document.getElementById("modifyBtn");
+
+window.addEventListener("DOMContentLoaded", () => {
+    if (query) {
+        createBtn.classList.add("d-none");
+        modifyBtn.classList.remove("d-none");
+        getItemData();
+    }
+})
+
+const getItemData = async () => {
+    try {
+        const data = await productApi.get(query);
+        loadInfo(data);
+    } catch (error) {
+        console.log("Error loading item data.", error)              // div errore
+    }
+}
+
+const loadInfo = (data) => {
+    console.log(data);
+    nameInput.value = data.name;
+    brandInput.value = data.brand;
+    descriptionInput.value = data.description;
+    priceInput.value = data.price;
+    imgUrlInput.value = data.imageUrl;
+}
 
 createBtn.addEventListener("click", async e => {
     e.preventDefault();
@@ -25,6 +54,31 @@ createBtn.addEventListener("click", async e => {
         }
         productApi.post(newItem)
             .then(data => console.log(data))
+    }
+})
+
+modifyBtn.addEventListener("click", async e => {
+    e.preventDefault();
+    // check if inputs are valid
+    const isValid = await checkInputs();
+
+    //modify item
+    if(isValid) {
+        const {nameData, brandData, descriptionData, priceData, imgUrl} = getInputData();
+        const modItem = {
+            name: nameData,
+            brand: brandData,
+            description: descriptionData,
+            price: parseFloat(priceData),
+            imageUrl: imgUrl
+        }
+
+        try {
+            await productApi.put(query, modItem)
+            window.location = "./index.html"
+        } catch (error) {
+            console.log("Error modifying object.", error)
+        }
     }
 })
 
