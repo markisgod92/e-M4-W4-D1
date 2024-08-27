@@ -10,8 +10,10 @@ const createBtn = document.getElementById("createBtn");
 
 createBtn.addEventListener("click", async e => {
     e.preventDefault();
+    // check if inputs are valid
     const isValid = await checkInputs();
 
+    // post new item
     if(isValid) {
         const {nameData, brandData, descriptionData, priceData, imgUrl} = getInputData();
         const newItem = {

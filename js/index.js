@@ -3,13 +3,20 @@ const productApi = new fetchAPI;
 
 const productsContainer = document.getElementById("productsContainer");
 
-productApi.get().then(data => {
-    data.forEach(product => createCard(product))
-})
+const loadData = async () => {
+    productsContainer.replaceChildren();
+
+    try {
+        const data = await productApi.get();
+        data.forEach(product => createCard(product));
+    } catch (error) {
+        console.error("Error loading data", error)      // div di errore
+    }
+}
 
 const createCard = (data) => {
     const wrapper = document.createElement("div");
-    wrapper.setAttribute("class", "col-12 col-md-6 col-lg-4");
+    wrapper.setAttribute("class", "col-12 col-md-6 col-lg-3");
 
     const card = document.createElement("div");
     card.setAttribute("class", "card h-100");
@@ -62,6 +69,20 @@ const createCardBody = (data, container) => {
     deleteIcon.setAttribute("class", "bi bi-trash");
     deleteBtn.appendChild(deleteIcon);
 
+    deleteBtn.addEventListener("click", () => deleteItem(data._id))
+
     buttonsContainer.append(modifyBtn, deleteBtn);
     container.append(title, brand, description, price, buttonsContainer);
 }
+
+const deleteItem = async (id) => {          // div di conferma
+    try {
+        await productApi.del(id);
+        await loadData()
+    } catch (error) {
+        console.error("Error deleting item", error)      // div di errore
+    }
+}
+
+
+window.addEventListener("DOMContentLoaded", loadData)

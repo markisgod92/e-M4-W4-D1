@@ -32,6 +32,21 @@ export class fetchAPI {
             console.error("POST error.", error)
         }
     }
+
+    async del(id) {
+        try {
+            const response = await fetch(this.#API_URL + id, {
+                method: "DELETE",
+                headers: {
+                    "Authorization": this.#ACCESS_TOKEN
+                }
+            })
+            const data = await response.json;
+            return data;
+        } catch (error) {
+            console.error("DELETE error", error)
+        }
+    }
 }
 
 
