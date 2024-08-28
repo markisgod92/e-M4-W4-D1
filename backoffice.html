@@ -30,36 +30,44 @@
     </header>
 
     <main>
-        <div class="container">
-            <div class="row">
-                <div class="col">
-                    <form>
-                        <div class="mb-3">
-                            <label for="nameInput">Product name</label>
-                            <input type="text" placeholder="Name" id="nameInput" class="form-control">
-                        </div>
-                        <div class="mb-3">
-                            <label for="brandInput">Brand</label>
-                            <input type="text" placeholder="Brand" id="brandInput" class="form-control">
-                        </div>
-                        <div class="mb-3">
-                            <label for="descriptionInput">Description</label>
-                            <input type="text" placeholder="Description" id="descriptionInput" class="form-control">
-                        </div>
-                        <div class="mb-3">
-                            <label for="priceInput">Price</label>
-                            <input type="number" placeholder="Price" id="priceInput" class="form-control">
-                        </div>
-                        <div class="mb-3">
-                            <label for="imgUrlInput">Image URL</label>
-                            <input type="text" placeholder="Image URL" id="imgUrlInput" class="form-control">
-                        </div>
-                        <button class="btn btn-success" id="createBtn">Create product</button>
-                        <button class="btn btn-secondary d-none" id="modifyBtn">Modify product</button>
-                    </form>
+      <div class="container">
+        <div class="row mt-4">
+          <div class="col-12 col-md-8 mt-4 mt-md-0">
+            <form>
+              <div class="mb-3">
+                <label for="nameInput">Product name</label>
+                <input type="text" placeholder="Name" id="nameInput" class="form-control">
+              </div>
+              <div class="mb-3">
+                <label for="brandInput">Brand</label>
+                <input type="text" placeholder="Brand" id="brandInput" class="form-control">
+              </div>
+              <div class="mb-3">
+                <label for="descriptionInput">Description</label>
+                <input type="text" placeholder="Description" id="descriptionInput" class="form-control">
+              </div>
+              <div class="mb-3">
+                <label for="priceInput">Price</label>
+                <input type="number" placeholder="Price" id="priceInput" class="form-control">
+              </div>
+              <div class="mb-3">
+                <label for="imgUrlInput">Image URL</label>
+                <input type="text" placeholder="Image URL" id="imgUrlInput" class="form-control">
+              </div>
+              <div>
+                <h5>Image preview:</h5>
+                <div class="d-flex justify-content-center">
+                  <img id="imagePreview" alt="image preview">
                 </div>
-            </div>
+              </div>
+              <div class="d-flex justify-content-center mt-5">
+                <button class="btn btn-success" id="createBtn">Create product</button>
+                <button class="btn btn-secondary d-none" id="modifyBtn">Modify product</button>
+              </div>
+            </form>
+          </div>
         </div>
+      </div>
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>

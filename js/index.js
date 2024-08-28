@@ -53,26 +53,45 @@ const createCardBody = (data, container) => {
     price.innerText = data.price.toFixed(2);
 
     const buttonsContainer = document.createElement("div");
-    buttonsContainer.setAttribute("class", "d-flex align-items-center justify-content-end gap-4");
+    buttonsContainer.setAttribute("class", "d-flex align-items-center justify-content-end gap-2");
 
+    // info button
+    const infoBtn = document.createElement("button");
+    infoBtn.setAttribute("class", "btn btn-primary");
+
+    const infoIcon = document.createElement("i");
+    infoIcon.setAttribute("class", "bi bi-info");
+
+    const infoSpan = document.createElement("span");
+    infoSpan.innerText = "Details";
+
+    infoBtn.append(infoIcon, infoSpan);
+
+    // modify button
     const modifyBtn = document.createElement("button");
     modifyBtn.setAttribute("class", "btn btn-secondary");
 
     const modifyIcon = document.createElement("i");
     modifyIcon.setAttribute("class", "bi bi-pencil-square");
+
     modifyBtn.appendChild(modifyIcon);
 
+    // delete button
     const deleteBtn = document.createElement("button");
     deleteBtn.setAttribute("class", "btn btn-danger");
 
     const deleteIcon = document.createElement("i");
     deleteIcon.setAttribute("class", "bi bi-trash");
+
     deleteBtn.appendChild(deleteIcon);
 
-    modifyBtn.addEventListener("click", () => window.location = `./backoffice.html?q=${data._id}`)
-    deleteBtn.addEventListener("click", () => deleteItem(data._id))
+    // event listeners
+    infoBtn.addEventListener("click", () => window.location = `./product.html?q=${data._id}`);
+    modifyBtn.addEventListener("click", () => window.location = `./backoffice.html?q=${data._id}`);
+    deleteBtn.addEventListener("click", () => deleteItem(data._id));
 
-    buttonsContainer.append(modifyBtn, deleteBtn);
+    //appends
+    buttonsContainer.append(infoBtn, modifyBtn, deleteBtn);
     container.append(title, brand, description, price, buttonsContainer);
 }
 
