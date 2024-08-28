@@ -67,14 +67,38 @@ export class fetchAPI {
 }
 
 
+export class SweetAlerts {
+    modifyAlert() {
+        return Swal.fire({
+            titleText: "Confirm modifies",
+            text: "The changes you are about to make are irreversible. Are you sure you want to continue?",
+            icon: "warning",
+            iconColor: "Orange",
+            position: "center",
+            allowOutsideClick: "false",
+            showCancelButton: "true",
+            confirmButtonText: "Modify"
+        })
+    }
 
-
-/*
-api.post({
-    name: "Prova",
-    description: "Prova prova",
-    brand: "Provolone",
-    imageUrl: "www.it",
-    price: 10
-}).then(data => console.log(data))
-*/
+    deleteAlert() {
+        return Swal.fire({
+            titleText: "Delete object",
+            text: `Type DELETE in the box below to continue. This action cannot be undone.`,
+            icon: "warning",
+            iconColor: "red",
+            position: "center",
+            allowOutsideClick: "false",
+            showCancelButton: "true",
+            confirmButtonText: "Delete",
+            input: "text",
+            inputPlaceholder: "Type DELETE here...",
+            preConfirm: (inputValue) => {
+                if(inputValue !== "DELETE") {
+                    Swal.showValidationMessage("You must type DELETE to confirm.");
+                    return false;
+                }
+            }
+        })
+    }
+}

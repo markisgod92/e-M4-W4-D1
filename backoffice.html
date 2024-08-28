@@ -8,70 +8,89 @@
     <title>Back Office</title>
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-lg bg-dark" data-bs-theme="dark">
-            <div class="container-fluid">
-              <a class="navbar-brand" href="./index.html">Epimarket</a>
-              <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-              </button>
-              <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                  <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="./index.html">Home</a>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link" href="#">Link</a>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </nav>
-    </header>
-
-    <main>
-      <div class="container">
-        <div class="row mt-4">
-          <div class="col-12 col-md-8 mt-4 mt-md-0">
-            <form>
-              <div class="mb-3">
-                <label for="nameInput">Product name</label>
-                <input type="text" placeholder="Name" id="nameInput" class="form-control">
-              </div>
-              <div class="mb-3">
-                <label for="brandInput">Brand</label>
-                <input type="text" placeholder="Brand" id="brandInput" class="form-control">
-              </div>
-              <div class="mb-3">
-                <label for="descriptionInput">Description</label>
-                <input type="text" placeholder="Description" id="descriptionInput" class="form-control">
-              </div>
-              <div class="mb-3">
-                <label for="priceInput">Price</label>
-                <input type="number" placeholder="Price" id="priceInput" class="form-control">
-              </div>
-              <div class="mb-3">
-                <label for="imgUrlInput">Image URL</label>
-                <input type="text" placeholder="Image URL" id="imgUrlInput" class="form-control">
-              </div>
-              <div>
-                <h5>Image preview:</h5>
-                <div class="d-flex justify-content-center">
-                  <img id="imagePreview" alt="image preview">
-                </div>
-              </div>
-              <div class="d-flex justify-content-center mt-5">
-                <button class="btn btn-success" id="createBtn">Create product</button>
-                <button class="btn btn-secondary d-none" id="modifyBtn">Modify product</button>
-              </div>
-            </form>
-          </div>
+  <header>
+    <nav class="navbar navbar-expand-lg bg-dark" data-bs-theme="dark">
+      <div class="container-fluid">
+        <a class="navbar-brand fs-2" href="./index.html">Epimarket</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+          aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="./index.html">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link disabled" aria-disabled="true">Customers</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link disabled" aria-disabled="true">Analytics</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link disabled" aria-disabled="true">Marketing</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link disabled" aria-disabled="true">Support</a>
+            </li>
+          </ul>
+          <a class="btn btn-light" href="./backoffice.html">
+            <i class="bi bi-file-earmark-plus"></i>
+            <span>New Product</span>
+          </a>
         </div>
       </div>
-    </main>
+    </nav>
+  </header>
 
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
-    <script type ="module" src="./js/backoffice.js"></script>
+  <main>
+    <div class="container">
+      <div class="row mt-4">
+        <div class="col-12 col-md-8 mt-4 mt-md-0">
+          <form>
+            <div class="mb-3">
+              <label for="nameInput">Product name</label>
+              <input type="text" placeholder="Name" id="nameInput" class="form-control">
+            </div>
+            <div class="mb-3">
+              <label for="brandInput">Brand</label>
+              <input type="text" placeholder="Brand" id="brandInput" class="form-control">
+            </div>
+            <div class="mb-3">
+              <label for="descriptionInput">Description</label>
+              <textarea type="text" placeholder="Description" id="descriptionInput" class="form-control"></textarea>
+            </div>
+            <div class="mb-3">
+              <label for="priceInput">Price</label>
+              <input type="number" placeholder="Price" id="priceInput" class="form-control w-25">
+            </div>
+            <div class="mb-3">
+              <label for="imgUrlInput">Image URL</label>
+              <input type="text" placeholder="Image URL" id="imgUrlInput" class="form-control">
+            </div>
+            <div>
+              <h5>Image preview:</h5>
+              <div class="d-flex justify-content-center">
+                <img id="imagePreview" alt="image preview">
+              </div>
+            </div>
+            <div class="d-flex justify-content-center mt-5">
+              <button class="btn btn-success" id="createBtn">Create product</button>
+              <button class="btn btn-secondary d-none" id="modifyBtn">Modify product</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+    integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+    crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"
+    integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy"
+    crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script type="module" src="./js/backoffice.js"></script>
 </body>
 </html>

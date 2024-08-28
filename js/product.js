@@ -1,5 +1,7 @@
 import { fetchAPI } from "./class.js";
 const productApi = new fetchAPI;
+import { SweetAlerts } from "./class.js";
+const alerts = new SweetAlerts;
 const params = new URLSearchParams(window.location.search);
 const query = params.get("q");
 
@@ -51,7 +53,12 @@ const convertUTC = (data) => {
 }
 
 modifyBtn.addEventListener("click", () => window.location = `./backoffice.html?q=${query}`);
-deleteBtn.addEventListener("click", () => deleteItem(query));
+
+deleteBtn.addEventListener("click", () => {
+    alerts.deleteAlert().then(result => {
+        if(result.isConfirmed) deleteItem(query);
+    })
+});
 
 const deleteItem = async (id) => {
     try {

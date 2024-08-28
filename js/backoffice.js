@@ -1,5 +1,7 @@
 import { fetchAPI } from "./class.js";
 const productApi = new fetchAPI;
+import { SweetAlerts } from "./class.js";
+const alerts = new SweetAlerts;
 const params = new URLSearchParams(window.location.search);
 const query = params.get("q");
 
@@ -83,9 +85,15 @@ modifyBtn.addEventListener("click", async e => {
     // check if inputs are valid
     const isValid = await checkInputs();
 
-    //modify item
-    if(isValid) {
-        const {nameData, brandData, descriptionData, priceData, imgUrl} = getInputData();
+
+    if(isValid) alerts.modifyAlert()
+        .then(result => {
+        if(result.isConfirmed) modifyProduct();
+    })
+})
+
+const modifyProduct = async () => {
+    const {nameData, brandData, descriptionData, priceData, imgUrl} = getInputData();
         const modItem = {
             name: nameData,
             brand: brandData,
@@ -96,12 +104,11 @@ modifyBtn.addEventListener("click", async e => {
 
         try {
             await productApi.put(query, modItem)
-            window.location = "./index.html"
+            window.location = `./product.html?q=${query}`;
         } catch (error) {
             console.log("Error modifying object.", error)
         }
-    }
-})
+}
 
 const getInputData = () => {
     const inputs = [nameInput, brandInput, descriptionInput, priceInput, imgUrlInput];

@@ -1,5 +1,7 @@
 import { fetchAPI } from "./class.js";
 const productApi = new fetchAPI;
+import { SweetAlerts } from "./class.js";
+const alerts = new SweetAlerts;
 
 const productsContainer = document.getElementById("productsContainer");
 
@@ -41,7 +43,7 @@ const createCardBody = (data, container) => {
     title.innerText = data.name;
 
     const brand = document.createElement("p");
-    brand.setAttribute("class", "card-subtitle");
+    brand.setAttribute("class", "card-subtitle fw-bold mb-3");
     brand.innerText = data.brand;
 
     const description = document.createElement("p");
@@ -50,7 +52,7 @@ const createCardBody = (data, container) => {
 
     const price = document.createElement("p");
     price.setAttribute("class", "card-text text-end fw-bold");
-    price.innerText = data.price.toFixed(2);
+    price.innerText = `${data.price.toFixed(2)} €`;
 
     const buttonsContainer = document.createElement("div");
     buttonsContainer.setAttribute("class", "d-flex align-items-center justify-content-end gap-2");
@@ -88,14 +90,18 @@ const createCardBody = (data, container) => {
     // event listeners
     infoBtn.addEventListener("click", () => window.location = `./product.html?q=${data._id}`);
     modifyBtn.addEventListener("click", () => window.location = `./backoffice.html?q=${data._id}`);
-    deleteBtn.addEventListener("click", () => deleteItem(data._id));
+    deleteBtn.addEventListener("click", () => {
+        alerts.deleteAlert().then(result => {
+            if(result.isConfirmed)  deleteItem(data._id)
+        })
+    })
 
     //appends
     buttonsContainer.append(infoBtn, modifyBtn, deleteBtn);
     container.append(title, brand, description, price, buttonsContainer);
 }
 
-const deleteItem = async (id) => {          // div di conferma
+const deleteItem = async (id) => {
     try {
         await productApi.del(id);
         await loadData()
