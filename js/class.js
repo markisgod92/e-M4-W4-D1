@@ -102,3 +102,70 @@ export class SweetAlerts {
         })
     }
 }
+
+export class UserManager {
+    isLogged() {
+        return window.localStorage.getItem("isUserLoggedIn") === "true";
+    }
+
+    login() {
+        const isUserLogged = this.isLogged();
+        window.localStorage.setItem("isUserLoggedIn", !isUserLogged);
+        window.location.reload()
+    }
+
+    isFavourite(obj) {
+        let favourites = window.localStorage.getItem("favourites");
+
+        favourites = favourites ? JSON.parse(favourites) : [];
+
+        const isFavourite = favourites.some(item => item.name === obj.name);
+
+        return isFavourite;
+    }
+
+    addFavourite(obj) {
+        let favourites = window.localStorage.getItem("favourites");
+
+        favourites = favourites ? JSON.parse(favourites) : [];
+
+        const isDuplicate = this.isFavourite(obj);
+
+        if (!isDuplicate) {
+            favourites.push(obj);
+            window.localStorage.setItem("favourites", JSON.stringify(favourites))
+        } else {
+            console.log("oggetto già presente")
+        }
+    }
+
+    isInCart(obj) {
+        let cart = window.localStorage.getItem("cart");
+
+        cart = cart ? JSON.parse(cart) : [];
+
+        const isAdded = cart.some(item => item.item.name === obj.name);
+
+        return isAdded;
+    }
+
+    addToCart(obj) {
+        let cart = window.localStorage.getItem("cart");
+
+        cart = cart ? JSON.parse(cart) : [];
+
+        const isAdded = this.isInCart(obj);
+
+        if (!isAdded) {
+            cart.push({
+                item: obj, 
+                quantity: 1
+            });
+        } else {
+            const item = cart.find(item => item.item.name === obj.name);
+            item.quantity += 1;
+        }
+
+        window.localStorage.setItem("cart", JSON.stringify(cart))
+    }
+}

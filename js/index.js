@@ -2,7 +2,10 @@ import { fetchAPI } from "./class.js";
 const productApi = new fetchAPI;
 import { SweetAlerts } from "./class.js";
 const alerts = new SweetAlerts;
+import { UserManager } from "./class.js";
+const userMng = new UserManager;
 
+const loginBtn = document.getElementById("loginBtn");
 const productsContainer = document.getElementById("productsContainer");
 
 const loadData = async () => {
@@ -29,10 +32,14 @@ const createCard = (data) => {
     img.alt = data.name;
 
     const cardBody = document.createElement("div");
-    cardBody.setAttribute("class", "card-body");
+    cardBody.setAttribute("class", "card-body d-flex flex-column");
     createCardBody(data, cardBody);
 
-    card.append(img, cardBody);
+    const cardFooter = document.createElement("div");
+    cardFooter.setAttribute("class", "card-footer d-flex gap-3 justify-content-between");
+    createCardFooter(data, cardFooter);
+
+    card.append(img, cardBody, cardFooter);
     wrapper.appendChild(card);
     productsContainer.appendChild(wrapper);
 }
@@ -51,23 +58,56 @@ const createCardBody = (data, container) => {
     description.innerText = data.description;
 
     const price = document.createElement("p");
-    price.setAttribute("class", "card-text text-end fw-bold");
+    price.setAttribute("class", "card-text text-end fw-bold mt-auto");
     price.innerText = `${data.price.toFixed(2)} €`;
 
-    const buttonsContainer = document.createElement("div");
-    buttonsContainer.setAttribute("class", "d-flex align-items-center justify-content-end gap-2");
+    container.append(title, brand, description, price);
+}
+
+const createCardFooter = (data, container) => {
+    const loggedMode = window.localStorage.getItem("isUserLoggedIn") === "true";
+
+    //favourite button
+    const favouriteBtn = document.createElement("button");
+    favouriteBtn.setAttribute("class", "btn rounded-circle");
+    if(userMng.isFavourite(data)) {
+        favouriteBtn.classList.add("btn-danger")
+    } else {
+        favouriteBtn.classList.add("btn-outline-danger")
+    }
+
+    const favouriteIcon = document.createElement("i");
+    favouriteIcon.setAttribute("class", "bi bi-heart");
+
+    favouriteBtn.appendChild(favouriteIcon);
+
+    //cart button
+    const cartBtn = document.createElement("button");
+    cartBtn.setAttribute("class", "btn btn-success w-100");
+
+    const cartIcon = document.createElement("i");
+    cartIcon.setAttribute("class", "bi bi-cart");
+
+    const cartSpan = document.createElement("span");
+    cartSpan.innerText = "Add to cart";
+
+    cartBtn.append(cartIcon, cartSpan);
+    container.append(favouriteBtn, cartBtn);
+
+
+    // if user logged, create management buttons
+    if(!loggedMode) return;
+
+    container.classList.toggle("flex-wrap")
 
     // info button
     const infoBtn = document.createElement("button");
     infoBtn.setAttribute("class", "btn btn-primary");
 
     const infoIcon = document.createElement("i");
-    infoIcon.setAttribute("class", "bi bi-info");
+    infoIcon.setAttribute("class", "bi bi-info-circle");
 
-    const infoSpan = document.createElement("span");
-    infoSpan.innerText = "Details";
-
-    infoBtn.append(infoIcon, infoSpan);
+    infoBtn.appendChild(infoIcon);
 
     // modify button
     const modifyBtn = document.createElement("button");
@@ -88,6 +128,8 @@ const createCardBody = (data, container) => {
     deleteBtn.appendChild(deleteIcon);
 
     // event listeners
+    favouriteBtn.addEventListener("click", () => userMng.addFavourite(data));
+    cartBtn.addEventListener("click", () => userMng.addToCart(data))
     infoBtn.addEventListener("click", () => window.location = `./product.html?q=${data._id}`);
     modifyBtn.addEventListener("click", () => window.location = `./backoffice.html?q=${data._id}`);
     deleteBtn.addEventListener("click", () => {
@@ -96,10 +138,11 @@ const createCardBody = (data, container) => {
         })
     })
 
-    //appends
-    buttonsContainer.append(infoBtn, modifyBtn, deleteBtn);
-    container.append(title, brand, description, price, buttonsContainer);
+    container.insertBefore(infoBtn, cartBtn)
+    container.insertBefore(modifyBtn, cartBtn)
+    container.insertBefore(deleteBtn, cartBtn)
 }
+
 
 const deleteItem = async (id) => {
     try {
@@ -110,5 +153,22 @@ const deleteItem = async (id) => {
     }
 }
 
+const updateLoginBtn = () => {
+    const isLogged = window.localStorage.getItem("isUserLoggedIn") === "true";
 
-window.addEventListener("DOMContentLoaded", loadData)
+    if (isLogged) {
+        loginBtn.querySelector("i").classList.replace("bi-box-arrow-in-right", "bi-box-arrow-left")
+        loginBtn.querySelector("span").innerText = "Log Out"
+    } else {
+        loginBtn.querySelector("i").classList.replace("bi-box-arrow-left", "bi-box-arrow-in-right")
+        loginBtn.querySelector("span").innerText = "Login"
+    }
+}
+
+updateLoginBtn();
+
+window.addEventListener("DOMContentLoaded", () => {
+    loadData()
+})
+
+loginBtn.addEventListener("click", () => userMng.login())
