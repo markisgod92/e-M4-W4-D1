@@ -230,18 +230,3 @@ export class UserManager {
         }
     }
 }
-
-export class ToastManager {
-    constructor(toastId) {
-        this.toastElement = document.getElementById(toastId);
-        this.toastBody = this.toastElement.querySelector('.toast-body');
-    }
-
-    toastAlert(message) {
-        this.toastBody.textContent = message;
-        
-        var toast = new bootstrap.Toast(this.toastElement);
-        
-        toast.show();
-    }
-}

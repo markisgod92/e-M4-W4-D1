@@ -91,7 +91,8 @@ createBtn.addEventListener("click", async e => {
             imageUrl: imgUrl
         }
         productApi.post(newItem)
-            .then(data => console.log(data))
+            .then(response => response._id)
+            .then(id => window.location = `./product.html?q=${id}`)
     }
 })
 
@@ -150,7 +151,7 @@ const checkInputs = async () => {
     // data
     const {nameData, brandData, descriptionData, priceData, imgUrl} = getInputData();
 
-    // check name valid and unique
+    // check name valid
     if(nameData === "") {
         nameInput.classList.add("input-error");
         isValid = false;
@@ -201,6 +202,11 @@ const checkUnique = async () => {
     let isUnique = true;
     const {nameData} = getInputData();
 
+    // return if name is unchanged
+    if(nameData === loadedItem.name && nameData !== "") {
+        return isUnique;
+    }
+
     try {
         const products = await productApi.get();
         const isDuplicate = products.some(product => product.name.toLowerCase() === nameData.toLowerCase());
@@ -231,7 +237,10 @@ const updateCartView = () => {
 
     const cart = JSON.parse(window.localStorage.getItem("cart")) || [];
 
-    cart.length > 0 ? cart.forEach(item => createCartDiv(item)) : cartOffcanvasContainer.innerText = "Cart is empty."
+    cart.length > 0 ? cart.forEach(item => createCartDiv(item)) : cartOffcanvasContainer.innerText = "Cart is empty.";
+
+    document.getElementById("cartQty").innerText = `${cart.reduce((acc, cur) => acc + cur.quantity, 0)} items`;
+    document.getElementById("cartTotal").innerText = `${(cart.reduce((acc, cur) => acc + (cur.item.price * cur.quantity), 0)).toFixed(2)} €`
 }
 
 const updateFavouritesView = () => {

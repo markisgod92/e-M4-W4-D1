@@ -1,8 +1,7 @@
-import { fetchAPI, SweetAlerts, UserManager, ToastManager } from "./class.js";
+import { fetchAPI, SweetAlerts, UserManager } from "./class.js";
 const productApi = new fetchAPI;
 const alerts = new SweetAlerts;
 const userMng = new UserManager;
-const toast = new ToastManager("toast");
 
 const loginBtn = document.getElementById("loginBtn");
 const newProductBtn = document.getElementById("newProductBtn");
@@ -11,6 +10,7 @@ const favouritesButton = document.getElementById("favouritesButton");
 const favouritesOffcanvasContainer = document.getElementById("favouritesOffcanvasContainer");
 const cartButton = document.getElementById("cartButton");
 const cartOffcanvasContainer = document.getElementById("cartOffcanvasContainer");
+const toast = new bootstrap.Toast(document.getElementById("toast"));
 
 const loadData = async () => {
     productsContainer.replaceChildren();
@@ -110,7 +110,7 @@ const createCardFooter = (data, container) => {
     favouriteBtn.addEventListener("click", () => userMng.addFavourite(data, favouriteBtn));
     cartBtn.addEventListener("click", () => {
         userMng.addToCart(data)
-        toast.toastAlert("Item added to cart.")
+        toast.show();
     })
     infoBtn.addEventListener("click", () => window.location = `./product.html?q=${data._id}`);
 
@@ -188,6 +188,9 @@ const updateCartView = () => {
     const cart = JSON.parse(window.localStorage.getItem("cart")) || [];
 
     cart.length > 0 ? cart.forEach(item => createCartDiv(item)) : cartOffcanvasContainer.innerText = "Cart is empty."
+
+    document.getElementById("cartQty").innerText = `${cart.reduce((acc, cur) => acc + cur.quantity, 0)} items`;
+    document.getElementById("cartTotal").innerText = `${(cart.reduce((acc, cur) => acc + (cur.item.price * cur.quantity), 0)).toFixed(2)} €`
 }
 
 const updateFavouritesView = () => {
