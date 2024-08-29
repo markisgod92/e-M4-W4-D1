@@ -1,9 +1,8 @@
-import { fetchAPI } from "./class.js";
+import { fetchAPI, SweetAlerts, UserManager, ToastManager } from "./class.js";
 const productApi = new fetchAPI;
-import { SweetAlerts } from "./class.js";
 const alerts = new SweetAlerts;
-import { UserManager } from "./class.js";
 const userMng = new UserManager;
+const toast = new ToastManager("toast");
 const params = new URLSearchParams(window.location.search);
 const query = params.get("q");
 
@@ -20,6 +19,10 @@ const price = document.getElementById("price");
 const productId = document.getElementById("productId");
 const createdAt = document.getElementById("createdAt");
 const lastUpdate = document.getElementById("lastUpdate");
+const favouritesButton = document.getElementById("favouritesButton");
+const favouritesOffcanvasContainer = document.getElementById("favouritesOffcanvasContainer");
+const cartButton = document.getElementById("cartButton");
+const cartOffcanvasContainer = document.getElementById("cartOffcanvasContainer");
 
 window.addEventListener("DOMContentLoaded", async () => {
     try {
@@ -50,7 +53,10 @@ const fillData = (data) => {
     lastUpdate.innerText = convertUTC(data.updatedAt);
 
     addFavouriteBtn.addEventListener("click", () => userMng.addFavourite(data, addFavouriteBtn));
-    addCartBtn.addEventListener("click", () => userMng.addToCart(data));
+    addCartBtn.addEventListener("click", () => {
+        userMng.addToCart(data);
+        toast.toastAlert("Item added to cart.")
+    })
     deleteBtn.addEventListener("click", () => {
         alerts.deleteAlert().then(result => {
             if(result.isConfirmed) {
@@ -105,6 +111,92 @@ const updateLoginBtn = () => {
     }
 }
 
+//OFFCANVAS FUNCTIONS
+const updateCartView = () => {
+    cartOffcanvasContainer.replaceChildren();
+
+    const cart = JSON.parse(window.localStorage.getItem("cart")) || [];
+
+    cart.length > 0 ? cart.forEach(item => createCartDiv(item)) : cartOffcanvasContainer.innerText = "Cart is empty."
+}
+
+const updateFavouritesView = () => {
+    favouritesOffcanvasContainer.replaceChildren();
+
+    const favourites = JSON.parse(window.localStorage.getItem("favourites")) || [];
+
+    favourites.length > 0 ? favourites.forEach(item => createFavouriteDiv(item)) : favouritesOffcanvasContainer.innerText = "No favourites."
+}
+
+const createCartDiv = (data) => {
+    const div = document.createElement("div");
+    div.setAttribute("class", "d-flex justify-content-between align-items-center my-3");
+
+    const img = document.createElement("img");
+    img.setAttribute("class", "cart-image");
+    img.src = data.item.imageUrl;
+    img.alt = data.item.name;
+
+    const body = document.createElement("div");
+    body.setAttribute("class", "d-flex flex-column gap-3")
+
+    const itemName = document.createElement("div");
+    itemName.innerText = data.item.name;
+
+    const quantity = document.createElement("div");
+    quantity.innerText = `Qty: ${data.quantity}`;
+
+    const cartDeleteBtn = document.createElement("button");
+    cartDeleteBtn.setAttribute("class", "btn btn-danger");
+
+    const cartDeleteIcon = document.createElement("i");
+    cartDeleteIcon.setAttribute("class", "bi bi-cart-x");
+
+    cartDeleteBtn.addEventListener("click", () => {
+        userMng.removeFromCart(data.item);
+        updateCartView()
+    })
+
+    body.append(itemName, quantity)
+    cartDeleteBtn.appendChild(cartDeleteIcon);
+    div.append(img, body, cartDeleteBtn);
+    cartOffcanvasContainer.appendChild(div);
+}
+
+const createFavouriteDiv = (data) => {
+    const div = document.createElement("div");
+    div.setAttribute("class", "d-flex justify-content-between align-items-center my-3");
+
+    const img = document.createElement("img");
+    img.setAttribute("class", "cart-image");
+    img.src = data.imageUrl;
+    img.alt = data.name;
+
+    const itemName = document.createElement("div");
+    itemName.innerText = data.name;
+
+    const favouriteDeleteBtn = document.createElement("button");
+    favouriteDeleteBtn.setAttribute("class", "btn btn-danger");
+
+    const favouriteDeleteIcon = document.createElement("i");
+    favouriteDeleteIcon.setAttribute("class", "bi bi-heartbreak");
+
+    favouriteDeleteBtn.addEventListener("click", () => {
+        if(data.name === name.innerText) {
+            addFavouriteBtn.classList.replace("btn-danger", "btn-outline-danger")
+        }
+        userMng.removeFavourite(data, favouriteDeleteBtn);
+        updateFavouritesView();
+    })
+
+    favouriteDeleteBtn.appendChild(favouriteDeleteIcon);
+    div.append(img, itemName, favouriteDeleteBtn);
+    favouritesOffcanvasContainer.appendChild(div);
+}
+
+
 updateLoginBtn();
 
 loginBtn.addEventListener("click", () => userMng.login())
+favouritesButton.addEventListener("click", () => updateFavouritesView());
+cartButton.addEventListener("click", () => updateCartView());

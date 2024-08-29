@@ -1,7 +1,8 @@
-import { fetchAPI, SweetAlerts, UserManager } from "./class.js";
+import { fetchAPI, SweetAlerts, UserManager, ToastManager } from "./class.js";
 const productApi = new fetchAPI;
 const alerts = new SweetAlerts;
 const userMng = new UserManager;
+const toast = new ToastManager("toast");
 
 const loginBtn = document.getElementById("loginBtn");
 const newProductBtn = document.getElementById("newProductBtn");
@@ -107,7 +108,10 @@ const createCardFooter = (data, container) => {
 
     // event listeners
     favouriteBtn.addEventListener("click", () => userMng.addFavourite(data, favouriteBtn));
-    cartBtn.addEventListener("click", () => userMng.addToCart(data))
+    cartBtn.addEventListener("click", () => {
+        userMng.addToCart(data)
+        toast.toastAlert("Item added to cart.")
+    })
     infoBtn.addEventListener("click", () => window.location = `./product.html?q=${data._id}`);
 
     container.append(favouriteBtn, infoBtn, cartBtn);
@@ -191,7 +195,7 @@ const updateFavouritesView = () => {
 
     const favourites = JSON.parse(window.localStorage.getItem("favourites")) || [];
 
-    favourites.length > 0 ? favourites.forEach(item => createFavouriteDiv(item)) : cartOffcanvasContainer.innerText = "No favourites."
+    favourites.length > 0 ? favourites.forEach(item => createFavouriteDiv(item)) : favouritesOffcanvasContainer.innerText = "No favourites."
 }
 
 const createCartDiv = (data) => {
