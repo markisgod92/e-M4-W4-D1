@@ -1,11 +1,10 @@
-import { fetchAPI } from "./class.js";
+import { fetchAPI, SweetAlerts, UserManager } from "./class.js";
 const productApi = new fetchAPI;
-import { SweetAlerts } from "./class.js";
 const alerts = new SweetAlerts;
-import { UserManager } from "./class.js";
 const userMng = new UserManager;
 
 const loginBtn = document.getElementById("loginBtn");
+const newProductBtn = document.getElementById("newProductBtn");
 const productsContainer = document.getElementById("productsContainer");
 
 const loadData = async () => {
@@ -92,13 +91,6 @@ const createCardFooter = (data, container) => {
     cartSpan.innerText = "Add to cart";
 
     cartBtn.append(cartIcon, cartSpan);
-    container.append(favouriteBtn, cartBtn);
-
-
-    // if user logged, create management buttons
-    if(!loggedMode) return;
-
-    container.classList.toggle("flex-wrap")
 
     // info button
     const infoBtn = document.createElement("button");
@@ -108,6 +100,19 @@ const createCardFooter = (data, container) => {
     infoIcon.setAttribute("class", "bi bi-info-circle");
 
     infoBtn.appendChild(infoIcon);
+
+    // event listeners
+    favouriteBtn.addEventListener("click", () => userMng.addFavourite(data, favouriteBtn));
+    cartBtn.addEventListener("click", () => userMng.addToCart(data))
+    infoBtn.addEventListener("click", () => window.location = `./product.html?q=${data._id}`);
+
+    container.append(favouriteBtn, infoBtn, cartBtn);
+
+
+    // if user logged, create management buttons
+    if(!loggedMode) return;
+
+    container.classList.toggle("flex-wrap")
 
     // modify button
     const modifyBtn = document.createElement("button");
@@ -128,17 +133,17 @@ const createCardFooter = (data, container) => {
     deleteBtn.appendChild(deleteIcon);
 
     // event listeners
-    favouriteBtn.addEventListener("click", () => userMng.addFavourite(data));
-    cartBtn.addEventListener("click", () => userMng.addToCart(data))
-    infoBtn.addEventListener("click", () => window.location = `./product.html?q=${data._id}`);
     modifyBtn.addEventListener("click", () => window.location = `./backoffice.html?q=${data._id}`);
     deleteBtn.addEventListener("click", () => {
         alerts.deleteAlert().then(result => {
-            if(result.isConfirmed)  deleteItem(data._id)
+            if(result.isConfirmed)  {
+                deleteItem(data._id)
+                userMng.removeFavourite(data, favouriteBtn)
+                userMng.removeFromCart(data);
+            }
         })
     })
 
-    container.insertBefore(infoBtn, cartBtn)
     container.insertBefore(modifyBtn, cartBtn)
     container.insertBefore(deleteBtn, cartBtn)
 }
@@ -159,9 +164,11 @@ const updateLoginBtn = () => {
     if (isLogged) {
         loginBtn.querySelector("i").classList.replace("bi-box-arrow-in-right", "bi-box-arrow-left")
         loginBtn.querySelector("span").innerText = "Log Out"
+        newProductBtn.classList.remove("d-none");
     } else {
         loginBtn.querySelector("i").classList.replace("bi-box-arrow-left", "bi-box-arrow-in-right")
         loginBtn.querySelector("span").innerText = "Login"
+        newProductBtn.classList.add("d-none");
     }
 }
 

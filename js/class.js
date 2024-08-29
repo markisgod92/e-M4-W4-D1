@@ -124,19 +124,52 @@ export class UserManager {
         return isFavourite;
     }
 
-    addFavourite(obj) {
+    addFavourite(obj, button) {
         let favourites = window.localStorage.getItem("favourites");
 
         favourites = favourites ? JSON.parse(favourites) : [];
 
-        const isDuplicate = this.isFavourite(obj);
+        const isFavourite = this.isFavourite(obj);
 
-        if (!isDuplicate) {
+        if (!isFavourite) {
             favourites.push(obj);
             window.localStorage.setItem("favourites", JSON.stringify(favourites))
+            button.classList.replace("btn-outline-danger", "btn-danger")
         } else {
-            console.log("oggetto già presente")
+            this.removeFavourite(obj, button);
         }
+    }
+
+    removeFavourite(obj, button) {
+        let favourites = window.localStorage.getItem("favourites");
+
+        favourites = favourites ? JSON.parse(favourites) : [];
+
+        const isFavourite = this.isFavourite(obj);
+
+        if (isFavourite) {
+            favourites = favourites.filter(item => item.name !== obj.name);
+            window.localStorage.setItem("favourites", JSON.stringify(favourites))
+            button.classList.replace("btn-danger", "btn-outline-danger")
+        }
+    }
+
+    updateFavouriteObj(oldData, newData) {
+        let favourites = window.localStorage.getItem("favourites");
+
+        favourites = favourites ? JSON.parse(favourites) : [];
+
+        const isFavourite = this.isFavourite(oldData);
+
+        if(!isFavourite) {
+            return
+        }
+
+        favourites = favourites.filter(item => item.name !== oldData.name)
+
+        favourites.push(newData);
+
+        window.localStorage.setItem("favourites", JSON.stringify(favourites))
     }
 
     isInCart(obj) {
@@ -167,5 +200,33 @@ export class UserManager {
         }
 
         window.localStorage.setItem("cart", JSON.stringify(cart))
+    }
+
+    removeFromCart(obj) {
+        let cart = window.localStorage.getItem("cart");
+
+        cart = cart ? JSON.parse(cart) : [];
+
+        const isAdded = this.isInCart(obj);
+
+        if(isAdded) {
+            cart = cart.filter(item => item.item.name !== obj.name)
+            window.localStorage.setItem("cart", JSON.stringify(cart))
+        }
+    }
+
+    updateCartObj(oldData, newData) {
+        let cart = window.localStorage.getItem("cart");
+
+        cart = cart ? JSON.parse(cart) : [];
+
+        const focusItem = cart.find(item => item.item.name === oldData.name);
+
+        if(focusItem) {
+            focusItem.item = newData;
+            window.localStorage.setItem("cart", JSON.stringify(cart))
+        } else {
+            return
+        }
     }
 }

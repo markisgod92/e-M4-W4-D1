@@ -2,6 +2,8 @@ import { fetchAPI } from "./class.js";
 const productApi = new fetchAPI;
 import { SweetAlerts } from "./class.js";
 const alerts = new SweetAlerts;
+import { UserManager } from "./class.js";
+const userMng = new UserManager;
 const params = new URLSearchParams(window.location.search);
 const query = params.get("q");
 
@@ -13,6 +15,8 @@ const priceInput = document.getElementById("priceInput");
 const imgUrlInput = document.getElementById("imgUrlInput");
 const createBtn = document.getElementById("createBtn");
 const modifyBtn = document.getElementById("modifyBtn");
+
+let loadedItem = {};
 
 window.addEventListener("DOMContentLoaded", () => {
     if (query) {
@@ -36,6 +40,7 @@ const getItemData = async () => {
 // pre compile form with item info
 const loadInfo = (data) => {
     console.log(data);
+    loadedItem = data;
     imagePreview.src = data.imageUrl;
     nameInput.value = data.name;
     brandInput.value = data.brand;
@@ -93,21 +98,24 @@ modifyBtn.addEventListener("click", async e => {
 })
 
 const modifyProduct = async () => {
-    const {nameData, brandData, descriptionData, priceData, imgUrl} = getInputData();
-        const modItem = {
-            name: nameData,
-            brand: brandData,
-            description: descriptionData,
-            price: parseFloat(priceData),
-            imageUrl: imgUrl
-        }
+    const { nameData, brandData, descriptionData, priceData, imgUrl } = getInputData();
+    const modItem = {
+        ...loadedItem,
+        name: nameData,
+        brand: brandData,
+        description: descriptionData,
+        price: parseFloat(priceData),
+        imageUrl: imgUrl,
+    }
 
-        try {
-            await productApi.put(query, modItem)
-            window.location = `./product.html?q=${query}`;
-        } catch (error) {
-            console.log("Error modifying object.", error)
-        }
+    try {
+        await productApi.put(query, modItem)
+        userMng.updateFavouriteObj(loadedItem, modItem)
+        userMng.updateCartObj(loadedItem, modItem);
+        window.location = `./product.html?q=${query}`;
+    } catch (error) {
+        console.log("Error modifying object.", error)
+    }
 }
 
 const getInputData = () => {

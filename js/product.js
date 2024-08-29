@@ -2,11 +2,16 @@ import { fetchAPI } from "./class.js";
 const productApi = new fetchAPI;
 import { SweetAlerts } from "./class.js";
 const alerts = new SweetAlerts;
+import { UserManager } from "./class.js";
+const userMng = new UserManager;
 const params = new URLSearchParams(window.location.search);
 const query = params.get("q");
 
+const newProductBtn = document.getElementById("newProductBtn");
 const modifyBtn = document.getElementById("modifyBtn");
 const deleteBtn = document.getElementById("deleteBtn");
+const addFavouriteBtn = document.getElementById("addFavouriteBtn");
+const addCartBtn = document.getElementById("addCartBtn");
 const image = document.getElementById("image");
 const name = document.getElementById("name");
 const brand = document.getElementById("brand");
@@ -33,9 +38,28 @@ const fillData = (data) => {
     brand.innerText = data.brand;
     description.innerText = data.description;
     price.innerText = `${data.price.toFixed(2)} €`;
+
+    if (userMng.isFavourite(data)) {
+        addFavouriteBtn.classList.add("btn-danger");
+    } else {
+        addFavouriteBtn.classList.add("btn-outline-danger");
+    }
+
     productId.innerText = data._id
     createdAt.innerText = convertUTC(data.createdAt);
     lastUpdate.innerText = convertUTC(data.updatedAt);
+
+    addFavouriteBtn.addEventListener("click", () => userMng.addFavourite(data, addFavouriteBtn));
+    addCartBtn.addEventListener("click", () => userMng.addToCart(data));
+    deleteBtn.addEventListener("click", () => {
+        alerts.deleteAlert().then(result => {
+            if(result.isConfirmed) {
+                userMng.removeFavourite(data, addFavouriteBtn)
+                userMng.removeFromCart(data);
+                deleteItem(query);
+            }
+        })
+    });
 }
 
 const convertUTC = (data) => {
@@ -54,11 +78,7 @@ const convertUTC = (data) => {
 
 modifyBtn.addEventListener("click", () => window.location = `./backoffice.html?q=${query}`);
 
-deleteBtn.addEventListener("click", () => {
-    alerts.deleteAlert().then(result => {
-        if(result.isConfirmed) deleteItem(query);
-    })
-});
+
 
 const deleteItem = async (id) => {
     try {
@@ -68,3 +88,23 @@ const deleteItem = async (id) => {
         console.log("Error deleting item", error)           // div errore
     }
 }
+
+const updateLoginBtn = () => {
+    const isLogged = window.localStorage.getItem("isUserLoggedIn") === "true";
+
+    if (isLogged) {
+        loginBtn.querySelector("i").classList.replace("bi-box-arrow-in-right", "bi-box-arrow-left")
+        loginBtn.querySelector("span").innerText = "Log Out"
+        newProductBtn.classList.remove("d-none");
+        modifyBtn.parentElement.classList.remove("d-none")
+    } else {
+        loginBtn.querySelector("i").classList.replace("bi-box-arrow-left", "bi-box-arrow-in-right")
+        loginBtn.querySelector("span").innerText = "Login"
+        newProductBtn.classList.add("d-none");
+        modifyBtn.parentElement.classList.add("d-none")
+    }
+}
+
+updateLoginBtn();
+
+loginBtn.addEventListener("click", () => userMng.login())
