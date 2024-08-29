@@ -68,7 +68,7 @@
     </nav>
   </header>
 
-  <main>
+  <main class="position-relative">
     <div class="container">
       <div class="row mt-4">
         <div class="col-12">
@@ -138,6 +138,14 @@
     <div class="offcanvas-body">
         <div id="favouritesOffcanvasContainer"></div>
     </div>
+</div>
+
+<!--ERROR TOAST-->
+<div id="errorToast" class="toast position-fixed bottom-0 end-0 m-5 text-bg-danger" role="alert" aria-live="assertive" aria-atomic="true">
+  <div class="toast-header">
+    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+  </div>
+  <div class="toast-body">Error, retry.</div>
 </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"

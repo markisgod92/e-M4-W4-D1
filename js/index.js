@@ -1,7 +1,8 @@
-import { fetchAPI, SweetAlerts, UserManager } from "./class.js";
+import { fetchAPI, SweetAlerts, UserManager, Elements } from "./class.js";
 const productApi = new fetchAPI;
 const alerts = new SweetAlerts;
 const userMng = new UserManager;
+const elements = new Elements;
 
 const loginBtn = document.getElementById("loginBtn");
 const newProductBtn = document.getElementById("newProductBtn");
@@ -11,15 +12,19 @@ const favouritesOffcanvasContainer = document.getElementById("favouritesOffcanva
 const cartButton = document.getElementById("cartButton");
 const cartOffcanvasContainer = document.getElementById("cartOffcanvasContainer");
 const toast = new bootstrap.Toast(document.getElementById("toast"));
+const errorToast = new bootstrap.Toast(document.getElementById("errorToast"));
 
 const loadData = async () => {
     productsContainer.replaceChildren();
-
+    
+    elements.startLoader(document.querySelector("main"));
     try {
         const data = await productApi.get();
+        elements.stopLoader();
         data.forEach(product => createCard(product));
     } catch (error) {
-        console.error("Error loading data", error)      // div di errore
+        elements.stopLoader();
+        elements.showError(document.querySelector("main"));
     }
 }
 
@@ -158,11 +163,15 @@ const createCardFooter = (data, container) => {
 
 
 const deleteItem = async (id) => {
+    elements.startCornerLoader(document.body);
+
     try {
         await productApi.del(id);
+        elements.stopCornerLoader()
         await loadData()
     } catch (error) {
-        console.error("Error deleting item", error)      // div di errore
+        elements.stopCornerLoader()
+        errorToast.show()
     }
 }
 

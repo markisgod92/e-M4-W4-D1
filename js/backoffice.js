@@ -1,7 +1,8 @@
-import { fetchAPI, SweetAlerts, UserManager } from "./class.js";
+import { fetchAPI, SweetAlerts, UserManager, Elements } from "./class.js";
 const productApi = new fetchAPI;
 const alerts = new SweetAlerts;
 const userMng = new UserManager;
+const elements = new Elements;
 const params = new URLSearchParams(window.location.search);
 const query = params.get("q");
 
@@ -20,6 +21,7 @@ const formMessage = document.getElementById("formMessage");
 const resetBtn = document.getElementById("resetBtn");
 const createBtn = document.getElementById("createBtn");
 const modifyBtn = document.getElementById("modifyBtn");
+const errorToast = new bootstrap.Toast(document.getElementById("errorToast"));
 
 let loadedItem = {};
 
@@ -35,11 +37,15 @@ window.addEventListener("DOMContentLoaded", () => {
 })
 
 const getItemData = async () => {
+    elements.startCornerLoader(document.querySelector("main"));
+
     try {
         const data = await productApi.get(query);
+        elements.stopCornerLoader()
         loadInfo(data);
     } catch (error) {
-        console.log("Error loading item data.", error)              // div errore
+        elements.stopCornerLoader()
+        elements.showError(document.querySelector("main"))
     }
 }
 
@@ -76,40 +82,61 @@ imgUrlInput.addEventListener("input", () => {
 
 createBtn.addEventListener("click", async e => {
     e.preventDefault();
-    // check if inputs are valid and object is unique
-    const isValid = await Promise.all([checkInputs(), checkUnique()])
-        .then(results => results.every(result => result === true))
+    elements.startCornerLoader(document.querySelector("main"));
 
-    // post new item
-    if(isValid) {
-        const {nameData, brandData, descriptionData, priceData, imgUrl} = getInputData();
-        const newItem = {
-            name: nameData,
-            brand: brandData,
-            description: descriptionData,
-            price: parseFloat(priceData),
-            imageUrl: imgUrl
+    // check if inputs are valid and object is unique
+    try {
+        const inputsValid = await checkInputs();
+        const unique = await checkUnique();
+
+        if(inputsValid && unique) {
+            const {nameData, brandData, descriptionData, priceData, imgUrl} = getInputData();
+            const newItem = {
+                name: nameData,
+                brand: brandData,
+                description: descriptionData,
+                price: parseFloat(priceData),
+                imageUrl: imgUrl
+            }
+
+            try {
+                const response = await productApi.post(newItem);
+                const updatedId = response._id;
+                elements.stopCornerLoader();
+                window.location = `./product.html?q=${updatedId}`
+            } catch (error) {
+                elements.stopCornerLoader();
+                errorToast.show()
+            }
+        } else {
+            elements.stopCornerLoader();
         }
-        productApi.post(newItem)
-            .then(response => response._id)
-            .then(id => window.location = `./product.html?q=${id}`)
+    } catch (error) {
+        elements.stopCornerLoader();
+        errorToast.show();
     }
 })
 
 modifyBtn.addEventListener("click", async e => {
     e.preventDefault();
-    // check if inputs are valid
-    const isValid = await Promise.all([checkInputs(), checkUnique()])
-        .then(results => results.every(result => result === true))
 
+    try {
+        // check if inputs are valid and name is unique
+        const inputsValid = await checkInputs();
+        const unique = await checkUnique();
 
-    if(isValid) alerts.modifyAlert()
-        .then(result => {
-        if(result.isConfirmed) modifyProduct();
-    })
+        if (inputsValid && unique) {
+            const result = await alerts.modifyAlert();
+            if(result.isConfirmed) modifyProduct();
+        }
+    } catch (error) {
+        errorToast.show();
+    }
 })
 
 const modifyProduct = async () => {
+    elements.startCornerLoader(document.querySelector("main"));
+
     const { nameData, brandData, descriptionData, priceData, imgUrl } = getInputData();
     const modItem = {
         ...loadedItem,
@@ -124,9 +151,12 @@ const modifyProduct = async () => {
         await productApi.put(query, modItem)
         userMng.updateFavouriteObj(loadedItem, modItem)
         userMng.updateCartObj(loadedItem, modItem);
+        elements.stopCornerLoader();
         window.location = `./product.html?q=${query}`;
+
     } catch (error) {
-        console.log("Error modifying object.", error)
+        elements.stopCornerLoader();
+        errorToast.show();
     }
 }
 
@@ -189,7 +219,7 @@ const checkInputs = async () => {
     try {
         new URL(imgUrl)
         imgUrlInput.classList.remove("input-error");
-    } catch (e) {
+    } catch (error) {
         imgUrlInput.classList.add("input-error");
         isValid = false;
         displayMessage("Image url not valid.")
@@ -199,30 +229,28 @@ const checkInputs = async () => {
 }
 
 const checkUnique = async () => {
-    let isUnique = true;
     const {nameData} = getInputData();
 
     // return if name is unchanged
     if(nameData === loadedItem.name && nameData !== "") {
-        return isUnique;
+        return true;
     }
 
     try {
         const products = await productApi.get();
         const isDuplicate = products.some(product => product.name.toLowerCase() === nameData.toLowerCase());
+
         if(isDuplicate) {
             nameInput.classList.add("input-error");
-            isUnique = false;
-            displayMessage("Product name already exists.")
+            displayMessage("Product name already exists.");
+            return false;
         } else {
             nameInput.classList.remove("input-error");
+            return true;
         }
     } catch (error) {
-        console.error("Error comparing products.", error);
-        isUnique = false;
+        throw new Error("Error checking uniqueness.")
     }
-
-    return isUnique;
 }
 
 const displayMessage = (messageString) => {

@@ -4,15 +4,19 @@ export class fetchAPI {
 
     async get(id = "") {
         try {
+            /* const response = await new Error("HTTP error"); */
             const response = await fetch(this.#API_URL + id, {
                 headers: {
                     "Authorization": this.#ACCESS_TOKEN
                 }
             });
+
+            if(!response.ok) throw new Error("HTTP error.")
+            
             const data = await response.json();
             return data;
         } catch (error) {
-            console.error("Error fetching data.", error)
+            throw error;
         }
     }
 
@@ -26,15 +30,19 @@ export class fetchAPI {
                 },
                 body: JSON.stringify(newObj)
             });
+
+            if(!response.ok) throw new Error("HTTP error.");
+
             const data = await response.json();
             return data;
         } catch (error) {
-            console.error("POST error.", error)
+            throw error;
         }
     }
 
     async put(id, modObj) {
         try {
+            /* const response = await new Error("HTTP error"); */
             const response = await fetch(this.#API_URL + id, {
                 method: "PUT",
                 headers: {
@@ -43,25 +51,32 @@ export class fetchAPI {
                 },
                 body: JSON.stringify(modObj)
             })
+
+            if(!response.ok) throw new Error("HTTP error.");
+
             const data = await response.json();
             return data;
         } catch (error) {
-            console.error("PUT error", error)
+            throw error;
         }
     }
 
     async del(id) {
         try {
+            /* const response = await new Error("HTTP error"); */
             const response = await fetch(this.#API_URL + id, {
                 method: "DELETE",
                 headers: {
                     "Authorization": this.#ACCESS_TOKEN
                 }
             })
+
+            if(!response.ok) throw new Error("HTTP error.");
+            
             const data = await response.json;
             return data;
         } catch (error) {
-            console.error("DELETE error", error)
+            throw error;
         }
     }
 }
@@ -228,5 +243,67 @@ export class UserManager {
         } else {
             return
         }
+    }
+}
+
+export class Elements {
+    startLoader(container) {
+        const wrapper = document.createElement("div");
+        wrapper.setAttribute("class", "loader position-absolute top-0 start-0 d-flex vh-100 w-100 bg-light justify-content-center align-items-center");
+
+        const spinner = document.createElement("div");
+        spinner.setAttribute("class", "spinner-grow text-secondary");
+        spinner.role = "status";
+
+        const span = document.createElement("span");
+        span.setAttribute("class", "visually-hidden");
+        span.innerText = "Loading...";
+
+        spinner.appendChild(span);
+        wrapper.appendChild(spinner);
+        container.appendChild(wrapper);
+    }
+
+    stopLoader() {
+        document.querySelector(".loader").remove();
+    }
+
+    showError(container) {
+        const wrapper = document.createElement("div");
+        wrapper.setAttribute("class", "position-absolute top-0 start-0 d-flex vh-100 vw-100 bg-light justify-content-center align-items-center");
+
+        const div = document.createElement("div");
+        div.setAttribute("class", "d-flex flex-column align-items-center");
+
+        const icon = document.createElement("i");
+        icon.setAttribute("class", "bi bi-bug fs-1");
+
+        const span = document.createElement("span");
+        span.innerText = "Error, try to refresh page."
+
+        div.append(icon, span);
+        wrapper.appendChild(div);
+        container.appendChild(wrapper);
+    }
+
+    startCornerLoader(container) {
+        const wrapper = document.createElement("div");
+        wrapper.setAttribute("class", "corner-loader position-fixed top-0 start-0 d-flex h-100 w-100 justify-content-end align-items-end");
+
+        const spinner = document.createElement("div");
+        spinner.setAttribute("class", "spinner-grow text-secondary m-5");
+        spinner.role = "status";
+
+        const span = document.createElement("span");
+        span.setAttribute("class", "visually-hidden");
+        span.innerText = "Loading...";
+
+        spinner.appendChild(span);
+        wrapper.appendChild(spinner);
+        container.appendChild(wrapper);
+    }
+
+    stopCornerLoader() {
+        document.querySelector(".corner-loader").remove();
     }
 }

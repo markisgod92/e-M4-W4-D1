@@ -1,7 +1,8 @@
-import { fetchAPI, SweetAlerts, UserManager } from "./class.js";
+import { fetchAPI, SweetAlerts, UserManager, Elements } from "./class.js";
 const productApi = new fetchAPI;
 const alerts = new SweetAlerts;
 const userMng = new UserManager;
+const elements = new Elements;
 const params = new URLSearchParams(window.location.search);
 const query = params.get("q");
 
@@ -23,18 +24,22 @@ const favouritesOffcanvasContainer = document.getElementById("favouritesOffcanva
 const cartButton = document.getElementById("cartButton");
 const cartOffcanvasContainer = document.getElementById("cartOffcanvasContainer");
 const toast = new bootstrap.Toast(document.getElementById("toast"));
+const errorToast = new bootstrap.Toast(document.getElementById("errorToast"));
 
 window.addEventListener("DOMContentLoaded", async () => {
+    elements.startLoader(document.querySelector("main"));
+
     try {
         const data = await productApi.get(query)
+        elements.stopLoader();
         fillData(data);
     } catch (error) {
-        console.log("Error loading data.", error)           // div errore
+        elements.stopLoader();
+        elements.showError(document.querySelector("main"))
     }
 })
 
 const fillData = (data) => {
-    console.log(data);
     image.src = data.imageUrl;
     image.alt = data.name;
     name.innerText = data.name;
@@ -87,11 +92,15 @@ modifyBtn.addEventListener("click", () => window.location = `./backoffice.html?q
 
 
 const deleteItem = async (id) => {
+    elements.startCornerLoader(document.querySelector("main"));
+
     try {
         await productApi.del(id);
+        elements.stopCornerLoader();
         window.location = "./index.html";
     } catch (error) {
-        console.log("Error deleting item", error)           // div errore
+        elements.stopCornerLoader();
+        errorToast.show();
     }
 }
 
