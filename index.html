@@ -40,6 +40,14 @@
               <i class="bi bi-file-earmark-plus"></i>
               <span>New Product</span>
             </a>
+            <button class="btn btn-outline-danger" type="button" id="favouritesButton" data-bs-toggle="offcanvas" data-bs-target="#favouritesOffcanvas" aria-controls="favouritesOffcanvas">
+              <i class="bi bi-heart"></i>
+              <span>Favourites</span>
+            </button>
+            <button class="btn btn-success" type="button" id="cartButton" data-bs-toggle="offcanvas" data-bs-target="#cartOffcanvas" aria-controls="cartOffcanvas">
+              <i class="bi bi-cart"></i>
+              <span>Cart</span>
+            </button>
             <button class="btn btn-primary text-white" id="loginBtn">
               <i class="bi bi-box-arrow-in-right"></i>
               <span>Login</span>
@@ -53,6 +61,28 @@
 
   <div class="container">
     <div class="row my-4 g-4" id="productsContainer"></div>
+  </div>
+
+  <!--CART OFFCANVAS-->
+  <div class="offcanvas offcanvas-end" tabindex="-1" id="cartOffcanvas" aria-labelledby="cartOffcanvasLabel">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title" id="cartOffcanvasLabel">Cart</h5>
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+      <div id="cartOffcanvasContainer"></div>
+    </div>
+  </div>
+
+  <!--FAVOURITES OFFCANVAS-->
+  <div class="offcanvas offcanvas-end" tabindex="-1" id="favouritesOffcanvas" aria-labelledby="favouritesOffcanvasLabel">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title" id="favouritesOffcanvasLabel">Favourites</h5>
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+      <div id="favouritesOffcanvasContainer"></div>
+    </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"

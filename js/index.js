@@ -6,6 +6,10 @@ const userMng = new UserManager;
 const loginBtn = document.getElementById("loginBtn");
 const newProductBtn = document.getElementById("newProductBtn");
 const productsContainer = document.getElementById("productsContainer");
+const favouritesButton = document.getElementById("favouritesButton");
+const favouritesOffcanvasContainer = document.getElementById("favouritesOffcanvasContainer");
+const cartButton = document.getElementById("cartButton");
+const cartOffcanvasContainer = document.getElementById("cartOffcanvasContainer");
 
 const loadData = async () => {
     productsContainer.replaceChildren();
@@ -172,10 +176,96 @@ const updateLoginBtn = () => {
     }
 }
 
+
+//OFFCANVAS FUNCTIONS
+const updateCartView = () => {
+    cartOffcanvasContainer.replaceChildren();
+
+    const cart = JSON.parse(window.localStorage.getItem("cart")) || [];
+
+    cart.length > 0 ? cart.forEach(item => createCartDiv(item)) : cartOffcanvasContainer.innerText = "Cart is empty."
+}
+
+const updateFavouritesView = () => {
+    favouritesOffcanvasContainer.replaceChildren();
+
+    const favourites = JSON.parse(window.localStorage.getItem("favourites")) || [];
+
+    favourites.length > 0 ? favourites.forEach(item => createFavouriteDiv(item)) : cartOffcanvasContainer.innerText = "No favourites."
+}
+
+const createCartDiv = (data) => {
+    const div = document.createElement("div");
+    div.setAttribute("class", "d-flex justify-content-between align-items-center my-3");
+
+    const img = document.createElement("img");
+    img.setAttribute("class", "cart-image");
+    img.src = data.item.imageUrl;
+    img.alt = data.item.name;
+
+    const body = document.createElement("div");
+    body.setAttribute("class", "d-flex flex-column gap-3")
+
+    const itemName = document.createElement("div");
+    itemName.innerText = data.item.name;
+
+    const quantity = document.createElement("div");
+    quantity.innerText = `Qty: ${data.quantity}`;
+
+    const cartDeleteBtn = document.createElement("button");
+    cartDeleteBtn.setAttribute("class", "btn btn-danger");
+
+    const cartDeleteIcon = document.createElement("i");
+    cartDeleteIcon.setAttribute("class", "bi bi-cart-x");
+
+    cartDeleteBtn.addEventListener("click", () => {
+        userMng.removeFromCart(data.item);
+        updateCartView()
+    })
+
+    body.append(itemName, quantity)
+    cartDeleteBtn.appendChild(cartDeleteIcon);
+    div.append(img, body, cartDeleteBtn);
+    cartOffcanvasContainer.appendChild(div);
+}
+
+const createFavouriteDiv = (data) => {
+    const div = document.createElement("div");
+    div.setAttribute("class", "d-flex justify-content-between align-items-center my-3");
+
+    const img = document.createElement("img");
+    img.setAttribute("class", "cart-image");
+    img.src = data.imageUrl;
+    img.alt = data.name;
+
+    const itemName = document.createElement("div");
+    itemName.innerText = data.name;
+
+    const favouriteDeleteBtn = document.createElement("button");
+    favouriteDeleteBtn.setAttribute("class", "btn btn-danger");
+
+    const favouriteDeleteIcon = document.createElement("i");
+    favouriteDeleteIcon.setAttribute("class", "bi bi-heartbreak");
+
+    favouriteDeleteBtn.addEventListener("click", () => {
+        userMng.removeFavourite(data, favouriteDeleteBtn);
+        updateFavouritesView();
+        loadData()
+    })
+
+    favouriteDeleteBtn.appendChild(favouriteDeleteIcon);
+    div.append(img, itemName, favouriteDeleteBtn);
+    favouritesOffcanvasContainer.appendChild(div);
+}
+
+
+
 updateLoginBtn();
 
 window.addEventListener("DOMContentLoaded", () => {
     loadData()
 })
 
-loginBtn.addEventListener("click", () => userMng.login())
+loginBtn.addEventListener("click", () => userMng.login());
+favouritesButton.addEventListener("click", () => updateFavouritesView());
+cartButton.addEventListener("click", () => updateCartView());

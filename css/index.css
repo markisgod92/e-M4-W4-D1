@@ -14,3 +14,9 @@
         height: 15vw;
     }
 }
+
+.cart-image {
+    height: 100px;
+    aspect-ratio: 1/1;
+    object-fit: cover;
+}
