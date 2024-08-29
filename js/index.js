@@ -263,6 +263,14 @@ const createFavouriteDiv = (data) => {
 updateLoginBtn();
 
 window.addEventListener("DOMContentLoaded", () => {
+    const isFirstTimeUser = window.localStorage.getItem("isFirstTimeUser");
+
+    if(isFirstTimeUser === null) {
+        const welcomeModal = new bootstrap.Modal(document.getElementById("welcomeModal"));
+        welcomeModal.show();
+        window.localStorage.setItem("isFirstTimeUser", "false");
+    }
+    
     loadData()
 })
 
