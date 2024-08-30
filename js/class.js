@@ -249,7 +249,7 @@ export class UserManager {
 export class Elements {
     startLoader(container) {
         const wrapper = document.createElement("div");
-        wrapper.setAttribute("class", "loader position-absolute top-0 start-0 d-flex vh-100 w-100 bg-light justify-content-center align-items-center");
+        wrapper.setAttribute("class", "loader position-absolute top-0 start-0 d-flex vh-100 w-100 bg-white justify-content-center align-items-center");
 
         const spinner = document.createElement("div");
         spinner.setAttribute("class", "spinner-grow text-secondary");
@@ -270,7 +270,7 @@ export class Elements {
 
     showError(container) {
         const wrapper = document.createElement("div");
-        wrapper.setAttribute("class", "position-absolute top-0 start-0 d-flex vh-100 vw-100 bg-light justify-content-center align-items-center");
+        wrapper.setAttribute("class", "position-absolute top-0 start-0 d-flex vh-100 vw-100 bg-white justify-content-center align-items-center");
 
         const div = document.createElement("div");
         div.setAttribute("class", "d-flex flex-column align-items-center");

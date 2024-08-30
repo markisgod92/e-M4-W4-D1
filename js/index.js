@@ -6,6 +6,7 @@ const elements = new Elements;
 
 const loginBtn = document.getElementById("loginBtn");
 const newProductBtn = document.getElementById("newProductBtn");
+const searchBar = document.getElementById("searchBar");
 const productsContainer = document.getElementById("productsContainer");
 const favouritesButton = document.getElementById("favouritesButton");
 const favouritesOffcanvasContainer = document.getElementById("favouritesOffcanvasContainer");
@@ -17,15 +18,34 @@ const errorToast = new bootstrap.Toast(document.getElementById("errorToast"));
 const loadData = async () => {
     productsContainer.replaceChildren();
     
-    elements.startLoader(document.querySelector("main"));
+    elements.startLoader(productsContainer);
     try {
         const data = await productApi.get();
         elements.stopLoader();
-        data.forEach(product => createCard(product));
+        visualizeData(data);
     } catch (error) {
         elements.stopLoader();
-        elements.showError(document.querySelector("main"));
+        elements.showError(productsContainer);
     }
+}
+
+const search = async (query) => {
+    productsContainer.replaceChildren();
+    
+    elements.startLoader(productsContainer);
+    try {
+        const data = await productApi.get();
+        elements.stopLoader();
+        const result = data.filter(item => item.name.toLowerCase().includes(query) || item.brand.toLowerCase().includes(query) || item.description.toLowerCase().includes(query));
+        visualizeData(result);
+    } catch (error) {
+        elements.stopLoader();
+        elements.showError(productsContainer);
+    }
+}
+
+const visualizeData = (data) => {
+    data.forEach(product => createCard(product))
 }
 
 const createCard = (data) => {
@@ -161,7 +181,6 @@ const createCardFooter = (data, container) => {
     container.insertBefore(deleteBtn, cartBtn)
 }
 
-
 const deleteItem = async (id) => {
     elements.startCornerLoader(document.body);
 
@@ -288,6 +307,16 @@ window.addEventListener("DOMContentLoaded", () => {
     }
     
     loadData()
+})
+
+searchBar.addEventListener("input", () => {
+    const query = searchBar.value.trim().toLowerCase();
+
+    if(query.length >= 3) {
+        search(query);
+    } else if (query.length === 0) {
+        loadData();
+    }
 })
 
 loginBtn.addEventListener("click", () => userMng.login());
