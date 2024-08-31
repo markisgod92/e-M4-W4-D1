@@ -103,11 +103,7 @@ const createCardFooter = (data, container) => {
     //favourite button
     const favouriteBtn = document.createElement("button");
     favouriteBtn.setAttribute("class", "btn rounded-circle");
-    if(userMng.isFavourite(data)) {
-        favouriteBtn.classList.add("btn-danger")
-    } else {
-        favouriteBtn.classList.add("btn-outline-danger")
-    }
+    checkFavouriteBtn(data, favouriteBtn);
 
     const favouriteIcon = document.createElement("i");
     favouriteIcon.setAttribute("class", "bi bi-heart");
@@ -137,6 +133,9 @@ const createCardFooter = (data, container) => {
 
     // event listeners
     favouriteBtn.addEventListener("click", () => userMng.addFavourite(data, favouriteBtn));
+
+    window.addEventListener("favouriteDeleted", () => checkFavouriteBtn(data, favouriteBtn));
+
     cartBtn.addEventListener("click", () => {
         userMng.addToCart(data)
         toast.show();
@@ -198,6 +197,16 @@ const deleteItem = async (id) => {
     }
 }
 
+const checkFavouriteBtn = (data, button) => {
+    if(userMng.isFavourite(data)) {
+        button.classList.remove("btn-outline-danger")
+        button.classList.add("btn-danger")
+    } else {
+        button.classList.remove("btn-danger")
+        button.classList.add("btn-outline-danger")
+    }
+}
+
 const updateLoginBtn = () => {
     if (userMng.isLogged()) {
         loginBtn.querySelector("i").classList.replace("bi-box-arrow-in-right", "bi-box-arrow-left")
@@ -236,7 +245,5 @@ searchBar.addEventListener("input", () => {
 loginBtn.addEventListener("click", () => userMng.login());
 
 favouritesButton.addEventListener("click", () => elements.updateFavouritesView());
-
-window.addEventListener("favouriteDeleted", () => loadData());
 
 cartButton.addEventListener("click", () => elements.updateCartView());
