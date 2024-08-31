@@ -2,10 +2,16 @@ import { fetchAPI, SweetAlerts, UserManager, Elements } from "./class.js";
 const productApi = new fetchAPI;
 const alerts = new SweetAlerts;
 const userMng = new UserManager;
-const elements = new Elements;
+const elements = new Elements({
+    userManager: userMng,
+    reloadFunction: () => {},
+    cartContainer: document.getElementById("cartOffcanvasContainer"), 
+    favouritesContainer: document.getElementById("favouritesOffcanvasContainer")
+});
 const params = new URLSearchParams(window.location.search);
 const query = params.get("q");
 
+// DOM Elements
 const newProductBtn = document.getElementById("newProductBtn");
 const modifyBtn = document.getElementById("modifyBtn");
 const deleteBtn = document.getElementById("deleteBtn");
@@ -20,25 +26,11 @@ const productId = document.getElementById("productId");
 const createdAt = document.getElementById("createdAt");
 const lastUpdate = document.getElementById("lastUpdate");
 const favouritesButton = document.getElementById("favouritesButton");
-const favouritesOffcanvasContainer = document.getElementById("favouritesOffcanvasContainer");
 const cartButton = document.getElementById("cartButton");
-const cartOffcanvasContainer = document.getElementById("cartOffcanvasContainer");
 const toast = new bootstrap.Toast(document.getElementById("toast"));
 const errorToast = new bootstrap.Toast(document.getElementById("errorToast"));
 
-window.addEventListener("DOMContentLoaded", async () => {
-    elements.startLoader(document.querySelector("main"));
-
-    try {
-        const data = await productApi.get(query)
-        elements.stopLoader();
-        fillData(data);
-    } catch (error) {
-        elements.stopLoader();
-        elements.showError(document.querySelector("main"))
-    }
-})
-
+// Functions
 const fillData = (data) => {
     image.src = data.imageUrl;
     image.alt = data.name;
@@ -87,10 +79,6 @@ const convertUTC = (data) => {
     return date.toLocaleString("it-IT", options)
 }
 
-modifyBtn.addEventListener("click", () => window.location = `./backoffice.html?q=${query}`);
-
-
-
 const deleteItem = async (id) => {
     elements.startCornerLoader(document.querySelector("main"));
 
@@ -105,9 +93,7 @@ const deleteItem = async (id) => {
 }
 
 const updateLoginBtn = () => {
-    const isLogged = window.localStorage.getItem("isUserLoggedIn") === "true";
-
-    if (isLogged) {
+     if (userMng.isLogged()) {
         loginBtn.querySelector("i").classList.replace("bi-box-arrow-in-right", "bi-box-arrow-left")
         loginBtn.querySelector("span").innerText = "Log Out"
         newProductBtn.classList.remove("d-none");
@@ -120,95 +106,32 @@ const updateLoginBtn = () => {
     }
 }
 
-//OFFCANVAS FUNCTIONS
-const updateCartView = () => {
-    cartOffcanvasContainer.replaceChildren();
+// Calls
+window.addEventListener("DOMContentLoaded", async () => {
+    updateLoginBtn();
+    elements.startLoader(document.querySelector("main"));
 
-    const cart = JSON.parse(window.localStorage.getItem("cart")) || [];
-
-    cart.length > 0 ? cart.forEach(item => createCartDiv(item)) : cartOffcanvasContainer.innerText = "Cart is empty.";
-
-    document.getElementById("cartQty").innerText = `${cart.reduce((acc, cur) => acc + cur.quantity, 0)} items`;
-    document.getElementById("cartTotal").innerText = `${(cart.reduce((acc, cur) => acc + (cur.item.price * cur.quantity), 0)).toFixed(2)} €`
-}
-
-const updateFavouritesView = () => {
-    favouritesOffcanvasContainer.replaceChildren();
-
-    const favourites = JSON.parse(window.localStorage.getItem("favourites")) || [];
-
-    favourites.length > 0 ? favourites.forEach(item => createFavouriteDiv(item)) : favouritesOffcanvasContainer.innerText = "No favourites."
-}
-
-const createCartDiv = (data) => {
-    const div = document.createElement("div");
-    div.setAttribute("class", "d-flex justify-content-between align-items-center my-3");
-
-    const img = document.createElement("img");
-    img.setAttribute("class", "cart-image");
-    img.src = data.item.imageUrl;
-    img.alt = data.item.name;
-
-    const body = document.createElement("div");
-    body.setAttribute("class", "d-flex flex-column gap-3")
-
-    const itemName = document.createElement("div");
-    itemName.innerText = data.item.name;
-
-    const quantity = document.createElement("div");
-    quantity.innerText = `Qty: ${data.quantity}`;
-
-    const cartDeleteBtn = document.createElement("button");
-    cartDeleteBtn.setAttribute("class", "btn btn-danger");
-
-    const cartDeleteIcon = document.createElement("i");
-    cartDeleteIcon.setAttribute("class", "bi bi-cart-x");
-
-    cartDeleteBtn.addEventListener("click", () => {
-        userMng.removeFromCart(data.item);
-        updateCartView()
-    })
-
-    body.append(itemName, quantity)
-    cartDeleteBtn.appendChild(cartDeleteIcon);
-    div.append(img, body, cartDeleteBtn);
-    cartOffcanvasContainer.appendChild(div);
-}
-
-const createFavouriteDiv = (data) => {
-    const div = document.createElement("div");
-    div.setAttribute("class", "d-flex justify-content-between align-items-center my-3");
-
-    const img = document.createElement("img");
-    img.setAttribute("class", "cart-image");
-    img.src = data.imageUrl;
-    img.alt = data.name;
-
-    const itemName = document.createElement("div");
-    itemName.innerText = data.name;
-
-    const favouriteDeleteBtn = document.createElement("button");
-    favouriteDeleteBtn.setAttribute("class", "btn btn-danger");
-
-    const favouriteDeleteIcon = document.createElement("i");
-    favouriteDeleteIcon.setAttribute("class", "bi bi-heartbreak");
-
-    favouriteDeleteBtn.addEventListener("click", () => {
-        if(data.name === name.innerText) {
-            addFavouriteBtn.classList.replace("btn-danger", "btn-outline-danger")
-        }
-        userMng.removeFavourite(data, favouriteDeleteBtn);
-        updateFavouritesView();
-    })
-
-    favouriteDeleteBtn.appendChild(favouriteDeleteIcon);
-    div.append(img, itemName, favouriteDeleteBtn);
-    favouritesOffcanvasContainer.appendChild(div);
-}
-
-
-updateLoginBtn();
+    try {
+        const data = await productApi.get(query)
+        elements.stopLoader();
+        fillData(data);
+    } catch (error) {
+        elements.stopLoader();
+        elements.showError(document.querySelector("main"))
+    }
+})
 
 loginBtn.addEventListener("click", () => userMng.login())
-favouritesButton.addEventListener("click", () => updateFavouritesView());
-cartButton.addEventListener("click", () => updateCartView());
+
+favouritesButton.addEventListener("click", () => elements.updateFavouritesView());
+
+modifyBtn.addEventListener("click", () => window.location = `./backoffice.html?q=${query}`);
+
+window.addEventListener("favouriteDeleted", event => {
+    // if deleting favourite from favourites list, update if item is the same visualized on page
+    if(event.detail.data.name === name.innerText) {
+        addFavouriteBtn.classList.replace("btn-danger", "btn-outline-danger");
+    }
+})
+
+cartButton.addEventListener("click", () => elements.updateCartView());

@@ -4,7 +4,6 @@ export class fetchAPI {
 
     async get(id = "") {
         try {
-            /* const response = await new Error("HTTP error"); */
             const response = await fetch(this.#API_URL + id, {
                 headers: {
                     "Authorization": this.#ACCESS_TOKEN
@@ -42,7 +41,6 @@ export class fetchAPI {
 
     async put(id, modObj) {
         try {
-            /* const response = await new Error("HTTP error"); */
             const response = await fetch(this.#API_URL + id, {
                 method: "PUT",
                 headers: {
@@ -63,7 +61,6 @@ export class fetchAPI {
 
     async del(id) {
         try {
-            /* const response = await new Error("HTTP error"); */
             const response = await fetch(this.#API_URL + id, {
                 method: "DELETE",
                 headers: {
@@ -80,7 +77,6 @@ export class fetchAPI {
         }
     }
 }
-
 
 export class SweetAlerts {
     modifyAlert() {
@@ -119,6 +115,15 @@ export class SweetAlerts {
 }
 
 export class UserManager {
+    #favourites;
+    #cart;
+
+    constructor() {
+        this.#favourites = this.#loadFavourites();
+        this.#cart = this.#loadCart();
+    }
+
+    // LOGIN METHODS
     isLogged() {
         return window.localStorage.getItem("isUserLoggedIn") === "true";
     }
@@ -129,26 +134,24 @@ export class UserManager {
         window.location.reload()
     }
 
+    // FAVOURITES METHODS
+    #loadFavourites() {
+        const stored = window.localStorage.getItem("favourites");
+        return stored ? JSON.parse(stored) : [];
+    }
+
+    #saveFavourites() {
+        window.localStorage.setItem("favourites", JSON.stringify(this.#favourites));
+    }
+
     isFavourite(obj) {
-        let favourites = window.localStorage.getItem("favourites");
-
-        favourites = favourites ? JSON.parse(favourites) : [];
-
-        const isFavourite = favourites.some(item => item.name === obj.name);
-
-        return isFavourite;
+        return this.#favourites.some(item => item.name === obj.name);
     }
 
     addFavourite(obj, button) {
-        let favourites = window.localStorage.getItem("favourites");
-
-        favourites = favourites ? JSON.parse(favourites) : [];
-
-        const isFavourite = this.isFavourite(obj);
-
-        if (!isFavourite) {
-            favourites.push(obj);
-            window.localStorage.setItem("favourites", JSON.stringify(favourites))
+        if (!this.isFavourite(obj)) {
+            this.#favourites.push(obj);
+            this.#saveFavourites();
             button.classList.replace("btn-outline-danger", "btn-danger")
         } else {
             this.removeFavourite(obj, button);
@@ -156,90 +159,64 @@ export class UserManager {
     }
 
     removeFavourite(obj, button) {
-        let favourites = window.localStorage.getItem("favourites");
-
-        favourites = favourites ? JSON.parse(favourites) : [];
-
-        const isFavourite = this.isFavourite(obj);
-
-        if (isFavourite) {
-            favourites = favourites.filter(item => item.name !== obj.name);
-            window.localStorage.setItem("favourites", JSON.stringify(favourites))
+        if (this.isFavourite(obj)) {
+            this.#favourites = this.#favourites.filter(item => item.name !== obj.name);
+            this.#saveFavourites();
             button.classList.replace("btn-danger", "btn-outline-danger")
         }
     }
 
     updateFavouriteObj(oldData, newData) {
-        let favourites = window.localStorage.getItem("favourites");
-
-        favourites = favourites ? JSON.parse(favourites) : [];
-
-        const isFavourite = this.isFavourite(oldData);
-
-        if(!isFavourite) {
+        if(!this.isFavourite(oldData)) {
             return
         }
 
-        favourites = favourites.filter(item => item.name !== oldData.name)
+        this.#favourites = this.#favourites.filter(item => item.name !== oldData.name)
+        this.#favourites.push(newData);
+        this.#saveFavourites();
+    }
 
-        favourites.push(newData);
+    // CART METHODS
+    #loadCart() {
+        const stored = window.localStorage.getItem("cart");
+        return stored ? JSON.parse(stored) : [];
+    }
 
-        window.localStorage.setItem("favourites", JSON.stringify(favourites))
+    #saveCart() {
+        window.localStorage.setItem("cart", JSON.stringify(this.#cart))
     }
 
     isInCart(obj) {
-        let cart = window.localStorage.getItem("cart");
-
-        cart = cart ? JSON.parse(cart) : [];
-
-        const isAdded = cart.some(item => item.item.name === obj.name);
-
-        return isAdded;
+        return this.#cart.some(item => item.item.name === obj.name);
     }
 
     addToCart(obj) {
-        let cart = window.localStorage.getItem("cart");
-
-        cart = cart ? JSON.parse(cart) : [];
-
-        const isAdded = this.isInCart(obj);
-
-        if (!isAdded) {
-            cart.push({
+        if (!this.isInCart(obj)) {
+            this.#cart.push({
                 item: obj, 
                 quantity: 1
             });
         } else {
-            const item = cart.find(item => item.item.name === obj.name);
+            const item = this.#cart.find(item => item.item.name === obj.name);
             item.quantity += 1;
         }
 
-        window.localStorage.setItem("cart", JSON.stringify(cart))
+        this.#saveCart();
     }
 
     removeFromCart(obj) {
-        let cart = window.localStorage.getItem("cart");
-
-        cart = cart ? JSON.parse(cart) : [];
-
-        const isAdded = this.isInCart(obj);
-
-        if(isAdded) {
-            cart = cart.filter(item => item.item.name !== obj.name)
-            window.localStorage.setItem("cart", JSON.stringify(cart))
+        if(this.isInCart(obj)) {
+            this.#cart = this.#cart.filter(item => item.item.name !== obj.name);
+            this.#saveCart();
         }
     }
 
     updateCartObj(oldData, newData) {
-        let cart = window.localStorage.getItem("cart");
-
-        cart = cart ? JSON.parse(cart) : [];
-
-        const focusItem = cart.find(item => item.item.name === oldData.name);
+        const focusItem = this.#cart.find(item => item.item.name === oldData.name);
 
         if(focusItem) {
             focusItem.item = newData;
-            window.localStorage.setItem("cart", JSON.stringify(cart))
+            this.#saveCart();
         } else {
             return
         }
@@ -247,6 +224,12 @@ export class UserManager {
 }
 
 export class Elements {
+    constructor({userManager, cartContainer, favouritesContainer}) {
+        this.userMng = userManager;
+        this.cartContainer = cartContainer;
+        this.favouritesContainer = favouritesContainer;
+    }
+
     startLoader(container) {
         const wrapper = document.createElement("div");
         wrapper.setAttribute("class", "loader position-absolute top-0 start-0 d-flex vh-100 w-100 bg-white justify-content-center align-items-center");
@@ -305,5 +288,91 @@ export class Elements {
 
     stopCornerLoader() {
         document.querySelector(".corner-loader").remove();
+    }
+
+    updateCartView() {
+        this.cartContainer.replaceChildren();
+    
+        const cart = JSON.parse(window.localStorage.getItem("cart")) || [];
+    
+        cart.length > 0 ? cart.forEach(item => this.createCartDiv(item)) : this.cartContainer.innerText = "Cart is empty.";
+    
+        document.getElementById("cartQty").innerText = `${cart.reduce((acc, cur) => acc + cur.quantity, 0)} items`;
+        document.getElementById("cartTotal").innerText = `${(cart.reduce((acc, cur) => acc + (cur.item.price * cur.quantity), 0)).toFixed(2)} €`
+    }
+
+    createCartDiv(data) {
+        const div = document.createElement("div");
+        div.setAttribute("class", "d-flex justify-content-between align-items-center my-3");
+    
+        const img = document.createElement("img");
+        img.setAttribute("class", "cart-image");
+        img.src = data.item.imageUrl;
+        img.alt = data.item.name;
+    
+        const body = document.createElement("div");
+        body.setAttribute("class", "d-flex flex-column gap-3")
+    
+        const itemName = document.createElement("div");
+        itemName.innerText = data.item.name;
+    
+        const quantity = document.createElement("div");
+        quantity.innerText = `Qty: ${data.quantity}`;
+    
+        const cartDeleteBtn = document.createElement("button");
+        cartDeleteBtn.setAttribute("class", "btn btn-danger");
+    
+        const cartDeleteIcon = document.createElement("i");
+        cartDeleteIcon.setAttribute("class", "bi bi-cart-x");
+    
+        cartDeleteBtn.addEventListener("click", () => {
+            this.userMng.removeFromCart(data.item);
+            this.updateCartView()
+        })
+    
+        body.append(itemName, quantity)
+        cartDeleteBtn.appendChild(cartDeleteIcon);
+        div.append(img, body, cartDeleteBtn);
+        this.cartContainer.appendChild(div);
+    }
+
+    updateFavouritesView() {
+        this.favouritesContainer.replaceChildren();
+    
+        const favourites = JSON.parse(window.localStorage.getItem("favourites")) || [];
+    
+        favourites.length > 0 ? favourites.forEach(item => this.createFavouriteDiv(item)) : this.favouritesContainer.innerText = "No favourites."
+    }
+
+    createFavouriteDiv(data) {
+        const div = document.createElement("div");
+        div.setAttribute("class", "d-flex justify-content-between align-items-center my-3");
+    
+        const img = document.createElement("img");
+        img.setAttribute("class", "cart-image");
+        img.src = data.imageUrl;
+        img.alt = data.name;
+    
+        const itemName = document.createElement("div");
+        itemName.innerText = data.name;
+    
+        const favouriteDeleteBtn = document.createElement("button");
+        favouriteDeleteBtn.setAttribute("class", "btn btn-danger");
+    
+        const favouriteDeleteIcon = document.createElement("i");
+        favouriteDeleteIcon.setAttribute("class", "bi bi-heartbreak");
+    
+        favouriteDeleteBtn.addEventListener("click", () => {
+            this.userMng.removeFavourite(data, favouriteDeleteBtn);
+            this.updateFavouritesView();
+            const event = new CustomEvent("favouriteDeleted", {
+                detail: { data }
+            });
+            window.dispatchEvent(event);
+        })
+    
+        favouriteDeleteBtn.appendChild(favouriteDeleteIcon);
+        div.append(img, itemName, favouriteDeleteBtn);
+        this.favouritesContainer.appendChild(div);
     }
 }
