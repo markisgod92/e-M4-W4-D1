@@ -4,7 +4,6 @@ const alerts = new SweetAlerts;
 const userMng = new UserManager;
 const elements = new Elements({
     userManager: userMng,
-    reloadFunction: () => {},
     cartContainer: document.getElementById("cartOffcanvasContainer"), 
     favouritesContainer: document.getElementById("favouritesOffcanvasContainer")
 });
